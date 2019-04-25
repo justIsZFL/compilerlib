@@ -1,6 +1,5 @@
 package cn.exp.zfl.testcompiler;
 
-import com.google.auto.service.AutoService;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
@@ -9,15 +8,12 @@ import com.squareup.javapoet.TypeSpec;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
-import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
@@ -35,7 +31,6 @@ import cn.zfl.aptlib.BindView;
  *
  * @author zfl
  */
-@AutoService(Processor.class)
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class MyClass extends AbstractProcessor {
     private Elements elementUtils;
@@ -66,7 +61,7 @@ public class MyClass extends AbstractProcessor {
 
             System.out.println("key2:" + next.getSimpleName());
             ClassName logClass = ClassName.get("android.util", "Log");
-            ClassName activityClass = ClassName.get("android.app", "Activity");
+//            ClassName activityClass = ClassName.get("android.app", "Activity");
             //创建参数  Map<String,Class<? extends IRouteGroup>>> routes
             ParameterSpec altlas = ParameterSpec
                     .builder(ClassName.get(next.asType()), "activity")
@@ -89,14 +84,14 @@ String pkt = classElement.getQualifiedName().toString().split("."+ classElement.
                 if (byView == null) {
                     continue;
                 }
-                Set<Modifier> modifiers = member.getModifiers();
-                boolean isPrivate = false;
-                for (Modifier modifier : modifiers) {
-                    isPrivate = Modifier.PRIVATE.equals(modifier);
-                }
-                if (isPrivate) {
+//                Set<Modifier> modifiers = member.getModifiers();
+//                boolean isPrivate = false;
+//                for (Modifier modifier : modifiers) {
+//                    isPrivate = Modifier.PRIVATE.equals(modifier);
+//                }
+//                if (isPrivate) {
 //                    throw new IllegalArgumentException(ClassName.get(next.asType()).toString() + member.getSimpleName() + "注解变量类型必须为public");
-                }
+//                }
                 //构建函数体
 //                method.addStatement("try{activity.$L = activity.findViewById($L);}catch ($T e){throw new NullPointerException($S);}",
 //                        member.getSimpleName(),//注解节点变量的名称
@@ -131,7 +126,7 @@ String pkt = classElement.getQualifiedName().toString().split("."+ classElement.
             }
         }
         System.out.println("======================APT结束=========================");
-        return true;
+        return false;
     }
 
 }
