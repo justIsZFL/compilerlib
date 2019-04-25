@@ -21,8 +21,9 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 
-import cn.zfl.aptlib.Test;
 import cn.zfl.aptlib.BindView;
+import cn.zfl.aptlib.Test;
+
 
 /**
  * AutoService 自动注册
