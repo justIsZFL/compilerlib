@@ -1,7 +1,7 @@
 apply plugin: 'java-library'
 apply plugin: 'com.github.dcendents.android-maven'
 
-group='com.github.justIsZFL'
+group 'com.github.justIsZFL'
 
 jar {
     manifestContentCharset 'utf-8'
@@ -10,17 +10,28 @@ jar {
         attributes "Main-Class": "cn.exp.zfl.testcompiler"
     }
     from {
-        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+        configurations.extraLibs.collect { it.isDirectory() ? it : zipTree(it) }
     }
+}
+task wrapper(type: Wrapper) {
+    gradleVersion = "3.0"
+}
+repositories {
+    mavenCentral()
+}
+configurations {
+    // configuration that holds jars to include in the jar
+    extraLibs
 }
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    //    implementation 'com.squareup:javapoet:1.11.1'
-    implementation 'com.github.justIsZFL:aptlib:0.2'
+    extraLibs  'com.squareup:javapoet:1.11.1'
+    extraLibs  'com.github.justIsZFL:aptlib:0.2'
+    configurations.compile.extendsFrom(configurations.extraLibs)
     //    implementation 'com.google.auto.service:auto-service:1.0-rc4'
     //    implementation 'com.google.auto.service:auto-service:1.0-rc5'
-//    implementation files('libs/aptlib-0.1.jar')
-//    implementation files('libs/javapoet-1.11.1.jar')
+    //    implementation files('libs/aptlib-0.1.jar')
+    //    implementation files('libs/javapoet-1.11.1.jar')
 }
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
