@@ -48,6 +48,11 @@ public class MyClass extends AbstractProcessor {
     }
 
     @Override
+    public Set<String> getSupportedOptions() {
+        return super.getSupportedOptions();
+    }
+
+    @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         System.out.println("======================APT启动=========================");
         for (TypeElement next : annotations) {
