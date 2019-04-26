@@ -24,6 +24,9 @@ import javax.lang.model.util.Elements;
 import cn.zfl.aptlib.BindView;
 import cn.zfl.aptlib.Test;
 
+//import cn.zfl.aptlib.BindView;
+//import cn.zfl.aptlib.Test;
+
 
 /**
  * AutoService 自动注册
@@ -44,7 +47,7 @@ public class MyClass extends AbstractProcessor {
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
-       return Collections.singleton(Test.class.getCanonicalName());
+        return Collections.singleton("cn.zfl.aptlib.Test");
     }
 
     @Override
@@ -55,41 +58,40 @@ public class MyClass extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         System.out.println("======================APT启动=========================");
-        for (TypeElement next : annotations) {
-            System.out.println("key1:" + next.getSimpleName());
-            System.out.println("key1:" + next.getQualifiedName());
-        }
-        Set<? extends Element> elementsAnnotatedWith = roundEnv.getElementsAnnotatedWith(Test.class);
-        for (Element next : elementsAnnotatedWith) {
-            Test annotation = next.getAnnotation(Test.class);
-            String path = annotation.path();
+        for (TypeElement next0 : annotations) {
+            System.out.println("key1:" + next0.getSimpleName());
+            System.out.println("key1:" + next0.getQualifiedName());
+            Set<? extends Element> elementsAnnotatedWith = roundEnv.getElementsAnnotatedWith(next0);
+            for (Element next : elementsAnnotatedWith) {
+//                Test annotation = next.getAnnotation(next0);
+//                String path = annotation.path();
 
 
-            System.out.println("key2:" + next.getSimpleName());
-            ClassName logClass = ClassName.get("android.util", "Log");
+                System.out.println("key2:" + next.getSimpleName());
+                ClassName logClass = ClassName.get("android.util", "Log");
 //            ClassName activityClass = ClassName.get("android.app", "Activity");
-            //创建参数  Map<String,Class<? extends IRouteGroup>>> routes
-            ParameterSpec altlas = ParameterSpec
-                    .builder(ClassName.get(next.asType()), "activity")
-                    .build();
-            //参数名
-            MethodSpec.Builder method = MethodSpec.methodBuilder("initLog")
-                    .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                    .addParameter(altlas)
-                    .addStatement("$T.e($S,$S+\"Inject\"+$L+\"---\"+$S)", logClass, "zfl", next.getSimpleName(), "activity", path);
-            //获取TypeElement的所有成员变量和成员方法
-            TypeElement classElement = (TypeElement) next;//获取节点的具体类型
-            System.out.println("key3:" + classElement.getQualifiedName());
-String pkt = classElement.getQualifiedName().toString().split("."+ classElement.getSimpleName())[0];
-            System.out.println("pkt:" + pkt);
-            List<? extends Element> allMembers = elementUtils.getAllMembers(classElement);
-            //遍历成员变量
-            for (Element member : allMembers) {
-                //找到被BYView注解的成员变量
-                BindView byView = member.getAnnotation(BindView.class);
-                if (byView == null) {
-                    continue;
-                }
+                //创建参数  Map<String,Class<? extends IRouteGroup>>> routes
+                ParameterSpec altlas = ParameterSpec
+                        .builder(ClassName.get(next.asType()), "activity")
+                        .build();
+                //参数名
+                MethodSpec.Builder method = MethodSpec.methodBuilder("initLog")
+                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                        .addParameter(altlas)
+                        .addStatement("$T.e($S,$S+\"Inject\"+$L+\"---\")", logClass, "zfl", next.getSimpleName(), "activity");
+                //获取TypeElement的所有成员变量和成员方法
+                TypeElement classElement = (TypeElement) next;//获取节点的具体类型
+                System.out.println("key3:" + classElement.getQualifiedName());
+                String pkt = classElement.getQualifiedName().toString().split("." + classElement.getSimpleName())[0];
+                System.out.println("pkt:" + pkt);
+                List<? extends Element> allMembers = elementUtils.getAllMembers(classElement);
+                //遍历成员变量
+                for (Element member : allMembers) {
+                    //找到被BYView注解的成员变量
+                    BindView byView = member.getAnnotation(BindView.class);
+                    if (byView == null) {
+                        continue;
+                    }
 //                Set<Modifier> modifiers = member.getModifiers();
 //                boolean isPrivate = false;
 //                for (Modifier modifier : modifiers) {
@@ -98,39 +100,41 @@ String pkt = classElement.getQualifiedName().toString().split("."+ classElement.
 //                if (isPrivate) {
 //                    throw new IllegalArgumentException(ClassName.get(next.asType()).toString() + member.getSimpleName() + "注解变量类型必须为public");
 //                }
-                //构建函数体
+                    //构建函数体
 //                method.addStatement("try{activity.$L = activity.findViewById($L);}catch ($T e){throw new NullPointerException($S);}",
 //                        member.getSimpleName(),//注解节点变量的名称
 //                        byView.value(),
 //                        NullPointerException.class,
 //                        ClassName.get(next.asType()).toString() + member.getSimpleName() + "注解变量类型为null");
-                method.beginControlFlow("try")
-                        .addStatement("activity.$L = activity.findViewById($L)", member.getSimpleName(), byView.value())
-                        .nextControlFlow("catch ($T e)", NullPointerException.class)
-                        .addStatement("throw new NullPointerException($S)", ClassName.get(next.asType()).toString() +"中的变量"+ member.getSimpleName() + "获取失败或者注解变量类型为null")
-                        .endControlFlow();
+                    method.beginControlFlow("try")
+                            .addStatement("activity.$L = activity.findViewById($L)", member.getSimpleName(), byView.value())
+                            .nextControlFlow("catch ($T e)", NullPointerException.class)
+                            .addStatement("throw new NullPointerException($S)", ClassName.get(next.asType()).toString() + "中的变量" + member.getSimpleName() + "获取失败或者注解变量类型为null")
+                            .endControlFlow();
 //                try {
 //
 //                }catch (NullPointerException e){
 //                    throw new NullPointerException("");
 //                }
-            }
+                }
 
-            //创建类
-            TypeSpec typeSpec = TypeSpec.classBuilder(next.getSimpleName() + "Inject")
-                    .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                    .addMethod(method.build())
-                    .build();
-            System.out.println("name:" + typeSpec.name);
-            //创建Java文件
-            JavaFile file = JavaFile.builder(pkt, typeSpec)
-                    .build();
-            try {
-                file.writeTo(processingEnv.getFiler());
-            } catch (IOException e) {
-                e.printStackTrace();
+                //创建类
+                TypeSpec typeSpec = TypeSpec.classBuilder(next.getSimpleName() + "Inject")
+                        .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                        .addMethod(method.build())
+                        .build();
+                System.out.println("name:" + typeSpec.name);
+                //创建Java文件
+                JavaFile file = JavaFile.builder(pkt, typeSpec)
+                        .build();
+                try {
+                    file.writeTo(processingEnv.getFiler());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
+
         System.out.println("======================APT结束=========================");
         return false;
     }
